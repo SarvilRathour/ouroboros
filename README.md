@@ -1,5 +1,5 @@
 # ouroboros
-** Docker Setup **
+**Docker Setup**
 ```
 docker run --name ouroboros \
     -e POSTGRES_PASSWORD=password \
@@ -12,4 +12,12 @@ docker run --name ouroboros \
 
 ```
 DATABASE_URL=postgres://sarvil:password@localhost:5432/cyclic
+```
+**To create database**
+```
+sqlx database create
+```
+**To execute database**
+```
+docker exec -it ouroboros psql -U sarvil -d cyclic
 ```
