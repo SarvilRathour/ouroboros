@@ -1,13 +1,15 @@
 use uuid::Uuid;
 use chrono::{DateTime,Utc};
 use serde::{Serialize,Deserialize};
-#[derive(Serialize, Deserialize,Debug)]
-// #[serde(rename_all="PascalCase")]
+use sqlx::{Decode, FromRow, prelude::Type};
+#[derive(Serialize, Deserialize,Debug,Clone,Type)]
+#[sqlx(type_name="roles")]
+
 pub enum UserRole{
     Admin,
     Staff
 }
-#[derive(Serialize, Deserialize,Debug)]
+#[derive(Serialize, Deserialize,Debug,FromRow,Clone)]
 pub struct User{
     pub id:Uuid,
     pub full_name:String,
@@ -15,5 +17,5 @@ pub struct User{
     pub password_hash:String,
     pub role:UserRole,
     pub created_at:DateTime<Utc>,
-    pub updated_at:DateTime<Utc>
+    pub updated_at:DateTime<Utc>,
 }

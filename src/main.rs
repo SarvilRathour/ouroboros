@@ -6,10 +6,12 @@ mod state;
 mod handlers;
 mod models;
 mod schemas;
+mod repositories;
 use schemas::user_schema::RegisterUserRequest;
 use state::AppState;
 use handlers::health::health_check;
 use handlers::user::register;
+use repositories::user_repo;
 use models::user::User;
 #[tokio::main]
 async fn main(){
