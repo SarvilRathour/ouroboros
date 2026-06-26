@@ -3,6 +3,9 @@ CREATE EXTENSION IF NOT EXISTS "pgcrypto";
 CREATE TYPE roles as ENUM ('Admin','Staff');
 CREATE TYPE task_status as ENUM ('todo','in_progress','done');
 CREATE TYPE task_priority as ENUM('low','medium','high');
+DROP TABLE IF EXISTS users;
+DROP TABLE IF EXISTS tasks;
+
 CREATE TABLE users(
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     full_name TEXT NOT NULL,

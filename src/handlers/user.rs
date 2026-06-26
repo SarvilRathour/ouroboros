@@ -24,6 +24,7 @@ pub async fn register(
         .await
         .unwrap();
     let secret = env::var("SECRET").expect("SECRET must be set in .env file or environment");
+
     let token = generate_token(user.id, &secret, &payload.role).unwrap();
 
     Json(json!({

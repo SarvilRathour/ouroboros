@@ -1,7 +1,7 @@
-use sqlx::PgPool;
-
 use crate::repositories::user_repo::UserRepo;
-#[derive(Clone)]
+use axum::extract::FromRef;
+use sqlx::PgPool;
+#[derive(Clone, FromRef)]
 pub struct AppState {
     pub db: PgPool,
     pub user_repo: UserRepo,

@@ -27,4 +27,12 @@ impl UserRepo {
         .await?;
         Ok(user)
     }
+    pub async fn find_by_id(&self, id: &str) -> Result<User, sqlx::Error> {
+        let user = sqlx::query_as::<Postgres, User>("SELECT * FROM users WHERE id = $1")
+            .bind(id)
+            .fetch_one(&self.db)
+            .await?;
+
+        Ok(user)
+    }
 }
