@@ -9,7 +9,11 @@ pub struct Claims {
     pub role: String,
     pub exp: usize,
 }
-pub fn generate_token(user_id: Uuid, secret: &str, role: &UserRole) -> Result<String, jsonwebtoken::errors::Error> {
+pub fn generate_token(
+    user_id: Uuid,
+    secret: &str,
+    role: &UserRole,
+) -> Result<String, jsonwebtoken::errors::Error> {
     let now = Utc::now();
     let exp = (now + Duration::hours(24)).timestamp() as usize;
 
