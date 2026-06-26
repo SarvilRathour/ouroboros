@@ -1,4 +1,5 @@
 use sqlx::{PgPool, Postgres};
+use uuid::Uuid;
 #[derive(Clone)]
 pub struct UserRepo {
     pub db: PgPool,
@@ -27,7 +28,7 @@ impl UserRepo {
         .await?;
         Ok(user)
     }
-    pub async fn find_by_id(&self, id: &str) -> Result<User, sqlx::Error> {
+    pub async fn find_by_id(&self, id: &Uuid) -> Result<User, sqlx::Error> {
         let user = sqlx::query_as::<Postgres, User>("SELECT * FROM users WHERE id = $1")
             .bind(id)
             .fetch_one(&self.db)

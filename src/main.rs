@@ -12,7 +12,7 @@ mod models;
 mod repositories;
 mod schemas;
 mod state;
-
+use handlers::curr_user::get_current_user;
 use auth::jwt;
 use handlers::health::health_check;
 use handlers::user::register;
@@ -32,7 +32,7 @@ async fn main() {
     let app = Router::new()
         .route("/health", get(health_check))
         .route("/seed/users", post(register))
-        .route("/current_user", get(curr_user))
+        .route("/current_user", get(get_current_user))
         // .route("/task", post(task_create))
         .with_state(app_state);
     let listener = tokio::net::TcpListener::bind("0.0.0.0:3000").await.unwrap();
