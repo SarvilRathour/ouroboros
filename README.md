@@ -20,4 +20,4 @@ sqlx database create
 **To execute database**
 ```
 docker exec -it ouroboros psql -U sarvil -d cyclic
-```
+```// activity update
