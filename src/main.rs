@@ -6,12 +6,14 @@ use axum::{
 };
 use serde_json::{Value, json};
 use std::env;
+mod auth;
 mod handlers;
 mod models;
 mod repositories;
 mod schemas;
 mod state;
-mod auth;
+
+use auth::jwt;
 use handlers::health::health_check;
 use handlers::user::register;
 use models::user::User;
@@ -30,7 +32,6 @@ async fn main() {
     let app = Router::new()
         .route("/health", get(health_check))
         .route("/seed/users", post(register))
-        
         // .route("/task", post(task_create))
         .with_state(app_state);
     let listener = tokio::net::TcpListener::bind("0.0.0.0:3000").await.unwrap();

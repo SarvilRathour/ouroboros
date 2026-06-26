@@ -1,12 +1,21 @@
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 use sqlx::{Decode, FromRow, prelude::Type};
+use std::fmt::Display;
 use uuid::Uuid;
 #[derive(Serialize, Deserialize, Debug, Clone, Type)]
 #[sqlx(type_name = "roles")]
 pub enum UserRole {
     Admin,
     Staff,
+}
+impl Display for UserRole {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            UserRole::Admin => write!(f, "Admin"),
+            UserRole::Staff => write!(f, "Staff"),
+        }
+    }
 }
 #[derive(Serialize, Deserialize, Debug, FromRow, Clone)]
 pub struct User {
