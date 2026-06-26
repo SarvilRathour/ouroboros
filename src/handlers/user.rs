@@ -1,12 +1,10 @@
-use axum::{Json};
+use axum::{Json,extract::State};
 use serde_json::{json,Value};
-
+use crate::state::AppState;
 use crate::schemas::user_schema::RegisterUserData;
-pub async fn register(Json(payload):Json<RegisterUserData>)->Json<Value>{
-    println!("{}",payload.full_name);
-    println!("{}",payload.email);
-    println!("{}",payload.password);
-    println!("{:#?}",payload.role);
+pub async fn register(State(state):State<AppState>,Json(payload):Json<RegisterUserData>)->Json<Value>{
+    let user=state.user_repo.create(&payload.full_name, &payload.email, &payload.password, &payload.role).await.unwrap();
+    println!("{:?}",user);
     Json(json!({
         "message":"received",
         "full_name":&payload.full_name
