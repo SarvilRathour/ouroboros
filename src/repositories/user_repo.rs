@@ -36,4 +36,11 @@ impl UserRepo {
 
         Ok(user)
     }
+    pub async fn find_by_email(&self,email:&str)->Result<User,sqlx::Error>{
+        let user=sqlx::query_as::<Postgres,User>("SELECT * FROM users WHERE Email=$1")
+            .bind(email)
+            .fetch_one(&self.db)
+            .await?;
+        Ok(user)
+    }
 }

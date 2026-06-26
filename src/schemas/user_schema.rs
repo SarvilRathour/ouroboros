@@ -12,3 +12,8 @@ pub struct RegisterUserData {
     pub password: String,
     pub role: UserRole,
 }
+#[derive(Debug, Deserialize, FromRow)]
+pub struct LoginUserRequest {
+    pub email: String,
+    pub password: String,
+}
