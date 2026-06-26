@@ -1,10 +1,13 @@
+use chrono::DateTime;
+use chrono::Utc;
 use sqlx::{PgPool, Postgres};
+
 use uuid::Uuid;
 #[derive(Clone)]
 pub struct UserRepo {
     pub db: PgPool,
 }
-use crate::models::user::{User, UserRole};
+use crate::models::user::{LoginChallenge, User, UserRole};
 
 impl UserRepo {
     pub fn new(db: PgPool) -> Self {
@@ -36,11 +39,37 @@ impl UserRepo {
 
         Ok(user)
     }
-    pub async fn find_by_email(&self,email:&str)->Result<User,sqlx::Error>{
-        let user=sqlx::query_as::<Postgres,User>("SELECT * FROM users WHERE Email=$1")
+    pub async fn find_by_email(&self, email: &str) -> Result<User, sqlx::Error> {
+        let user = sqlx::query_as::<Postgres, User>("SELECT * FROM users WHERE Email=$1")
             .bind(email)
             .fetch_one(&self.db)
             .await?;
         Ok(user)
+    }
+    pub async fn create_challenge(
+        &self,
+        user_id: &Uuid,
+        code: &str,
+        expires_at: &DateTime<Utc>,
+    ) -> Result<Uuid, sqlx::Error> {
+        let record_id = sqlx::query_scalar::<Postgres, Uuid>(
+            "INSERT INTO login_challenges(user_id,code,expires_at) VALUES($1,$2,$3) RETURNING id",
+        )
+        .bind(user_id)
+        .bind(code)
+        .bind(expires_at)
+        .fetch_one(&self.db)
+        .await?;
+        Ok(record_id)
+    }
+    pub async fn find_challenge_by_id(&self, id: &Uuid) -> Result<LoginChallenge, sqlx::Error> {
+        let challenge = sqlx::query_as::<Postgres, LoginChallenge>(
+            "SELECT * FROM login_challenges WHERE id = $1",
+        )
+        .bind(id)
+        .fetch_one(&self.db)
+        .await?;
+
+        Ok(challenge)
     }
 }

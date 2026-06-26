@@ -1,6 +1,9 @@
 use crate::models::user::UserRole;
+use chrono::DateTime;
+use chrono::Utc;
 use serde::{Deserialize, Serialize};
 use sqlx::prelude::FromRow;
+use uuid::Uuid;
 #[derive(Debug, Deserialize)]
 pub struct RegisterUserRequest {
     pub user: RegisterUserData,

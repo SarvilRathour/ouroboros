@@ -1,9 +1,9 @@
+use crate::{auth::jwt::validate_token, models::user::UserRole, state::AppState};
 use axum::{
     extract::{FromRef, FromRequestParts},
     http::StatusCode,
 };
 use uuid::Uuid;
-use crate::{auth::jwt::validate_token, models::user::UserRole, state::AppState};
 pub struct auth_user {
     pub user_id: String,
     pub username: String,
@@ -12,7 +12,7 @@ pub struct auth_user {
 impl<S> FromRequestParts<S> for auth_user
 where
     AppState: FromRef<S>,
-    S: Send+Sync,
+    S: Send + Sync,
 {
     type Rejection = StatusCode;
     async fn from_request_parts(
@@ -24,14 +24,15 @@ where
         let token = extract_token(headers);
         if let Some(token) = token {
             let jwt_secret = std::env::var("SECRET").unwrap();
-            let claims = validate_token(&token, &jwt_secret)
-                .map_err(|e| {
-                    eprintln!("JWT VALIDATION FAILED: {:?}", e);
-                    StatusCode::UNAUTHORIZED
-                })?;
+            let claims = validate_token(&token, &jwt_secret).map_err(|e| {
+                eprintln!("JWT VALIDATION FAILED: {:?}", e);
+                StatusCode::UNAUTHORIZED
+            })?;
             println!("SUB: {}", claims.sub);
             let user_id = Uuid::parse_str(&claims.sub).map_err(|_| StatusCode::UNAUTHORIZED)?;
-            let user = app_state.user_repo.find_by_id(&user_id)
+            let user = app_state
+                .user_repo
+                .find_by_id(&user_id)
                 .await
                 .map_err(|e| {
                     eprintln!("DB LOOKUP FAILED: {:?}", e);

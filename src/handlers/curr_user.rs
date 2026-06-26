@@ -1,6 +1,6 @@
 use crate::auth::middleware::auth_user;
-use axum::extract::State;
 use crate::state::AppState;
+use axum::extract::State;
 use axum::response::Json;
 use serde_json::json;
 // let auth_user = auth_user {
@@ -8,7 +8,10 @@ use serde_json::json;
 //     username: user.full_name,
 //     role: user.role,
 // };
-pub async fn get_current_user(State(state): State<AppState>, auth: auth_user) -> Json<serde_json::Value> {
+pub async fn get_current_user(
+    State(state): State<AppState>,
+    auth: auth_user,
+) -> Json<serde_json::Value> {
     Json(json!({
         "user_id":auth.user_id,
         "username":auth.username,

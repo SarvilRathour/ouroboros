@@ -27,3 +27,10 @@ pub struct User {
     pub created_at: DateTime<Utc>,
     pub updated_at: DateTime<Utc>,
 }
+#[derive(Debug, Deserialize, FromRow)]
+pub struct LoginChallenge {
+    pub id: Uuid,
+    pub user_id: Uuid,
+    pub code: String,
+    pub expires_at: DateTime<Utc>,
+}
