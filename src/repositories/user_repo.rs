@@ -72,4 +72,11 @@ impl UserRepo {
 
         Ok(challenge)
     }
+    pub async fn delete_challenge(&self,id:&Uuid)->Result<(),sqlx::Error>{
+        sqlx::query("DELETE FROM login_challenges WHERE id=$1")
+            .bind(id)
+            .execute(&self.db)
+            .await?;
+        Ok(())
+    }
 }

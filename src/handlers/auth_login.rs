@@ -1,6 +1,7 @@
 use crate::AppState;
 use crate::auth::jwt::generate_token;
 use crate::auth::password::verify_password;
+use crate::handlers::two_fa_login::two_factor_login;
 use crate::schemas::user_schema::LoginUserRequest;
 use axum::extract::Json;
 use axum::extract::State;
@@ -90,10 +91,10 @@ pub async fn login(
             eprintln!("Failed to send email: {}", e);
             return Err(StatusCode::INTERNAL_SERVER_ERROR);
         }
+
     Ok(Json(json!({
         "message": "Challenge created successfully and verification email sent",
         "challenge": challenge.id,
-        "code":challenge.code,
         "expires_at": challenge.expires_at,
     })))
 

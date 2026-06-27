@@ -34,3 +34,9 @@ pub struct LoginChallenge {
     pub code: String,
     pub expires_at: DateTime<Utc>,
 }
+
+#[derive(Debug, Deserialize, FromRow)]
+pub struct TwoFactorLogin {
+    pub id: Uuid,
+    pub code: String,
+}
