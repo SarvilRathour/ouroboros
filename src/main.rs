@@ -37,7 +37,7 @@ async fn main() {
         .route("/current_user", get(get_current_user))
         .route("/auth/login", post(login))
         .route("/auth/2fa_login", post(two_factor_login))
-        // .route("/task", post(task_create))
+        .route("/task", post(task_create))
         .with_state(app_state);
     let listener = tokio::net::TcpListener::bind("0.0.0.0:3000").await.unwrap();
     axum::serve(listener, app).await.unwrap();

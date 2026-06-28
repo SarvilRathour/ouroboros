@@ -9,6 +9,11 @@ pub struct auth_user {
     pub username: String,
     pub role: UserRole,
 }
+pub struct Claim {
+    pub sub: String,
+    pub role: String,
+    pub exp: usize,
+}
 impl<S> FromRequestParts<S> for auth_user
 where
     AppState: FromRef<S>,
@@ -28,7 +33,7 @@ where
                 eprintln!("JWT VALIDATION FAILED: {:?}", e);
                 StatusCode::UNAUTHORIZED
             })?;
-            println!("SUB: {}", claims.sub);
+            // println!("SUB: {}", claims.sub);
             let user_id = Uuid::parse_str(&claims.sub).map_err(|_| StatusCode::UNAUTHORIZED)?;
             let user = app_state
                 .user_repo
@@ -57,5 +62,32 @@ fn extract_token(headers: &axum::http::HeaderMap) -> Option<&str> {
         Some(&token[7..])
     } else {
         None
+    }
+}
+impl<S> FromRequestParts<S> for Claim
+where
+    AppState: FromRef<S>,
+    S: Send + Sync,
+{
+    type Rejection=StatusCode;
+    async fn from_request_parts(parts: &mut axum::http::request::Parts, state: &S) -> Result<Self, Self::Rejection> {
+        let app_state = AppState::from_ref(state);
+        let headers = &parts.headers;
+        let token = extract_token(headers);
+        if let Some(token) = token {
+            let jwt_secret = std::env::var("SECRET").unwrap();
+            let claims = validate_token(&token, &jwt_secret).map_err(|e| {
+                eprintln!("JWT VALIDATION FAILED: {:?}", e);
+                StatusCode::UNAUTHORIZED
+            })?;
+            let claim = Claim {
+                sub: claims.sub,
+                role: claims.role,
+                exp: claims.exp,
+            };
+            Ok(claim)
+        } else {
+            Err(StatusCode::UNAUTHORIZED)
+        }
     }
 }

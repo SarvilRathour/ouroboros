@@ -8,7 +8,7 @@ pub struct UserRepo {
     pub db: PgPool,
 }
 use crate::models::user::{LoginChallenge, User, UserRole};
-
+use crate::models::user::{task_status,task_priority};
 impl UserRepo {
     pub fn new(db: PgPool) -> Self {
         Self { db }
@@ -75,6 +75,18 @@ impl UserRepo {
     pub async fn delete_challenge(&self,id:&Uuid)->Result<(),sqlx::Error>{
         sqlx::query("DELETE FROM login_challenges WHERE id=$1")
             .bind(id)
+            .execute(&self.db)
+            .await?;
+        Ok(())
+    }
+    pub async fn create_task(&self,title:&str,description:&str,status:&task_status,priority:&task_priority,created_by:&Uuid,assign_to:&Uuid)->Result<(),sqlx::Error>{
+        sqlx::query("INSERT INTO tasks (title,description,status,priority,created_by,assign_to) VALUES ($1,$2,$3,$4,$5,$6)")
+            .bind(title)
+            .bind(description)
+            .bind(status)
+            .bind(priority)
+            .bind(created_by)
+            .bind(assign_to)
             .execute(&self.db)
             .await?;
         Ok(())

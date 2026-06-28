@@ -9,6 +9,7 @@ pub struct Claims {
     pub role: String,
     pub exp: usize,
 }
+
 pub fn generate_token(
     user_id: Uuid,
     secret: &str,
