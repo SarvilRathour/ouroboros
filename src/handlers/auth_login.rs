@@ -7,17 +7,17 @@ use axum::extract::Json;
 use axum::extract::State;
 use axum::http::StatusCode;
 use axum::response::IntoResponse;
-use rand::Rng;
 use lettre::message::header::ContentType;
 use lettre::transport::smtp::authentication::Credentials;
-use lettre::{Message, AsyncSmtpTransport, Tokio1Executor, AsyncTransport};
+use lettre::{AsyncSmtpTransport, AsyncTransport, Message, Tokio1Executor};
+use rand::Rng;
 use serde_json::{Value, json};
 use std::env;
 use std::fmt;
 #[derive(Debug)]
 pub enum EmailError {
     SendFailed,
-    InvalidEmail
+    InvalidEmail,
 }
 impl fmt::Display for EmailError {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
@@ -33,7 +33,7 @@ fn generate_6_digit_code() -> String {
     let number = rng.gen_range(0..=999999);
     format!("{:06}", number)
 }
-pub async fn send_verification_email(email:&str,code:&str)->Result<(),EmailError> {
+pub async fn send_verification_email(email: &str, code: &str) -> Result<(), EmailError> {
     let smtp_username = env::var("SMTP_EMAIL").unwrap_or_default();
     let smtp_password = env::var("SMTP_PASSWORD").unwrap_or_default();
     let email = Message::builder()
@@ -43,13 +43,16 @@ pub async fn send_verification_email(email:&str,code:&str)->Result<(),EmailError
         .body(format!("Your verification code is: {}", code))
         .unwrap();
     let creds = Credentials::new(smtp_username, smtp_password);
-    let mailer: AsyncSmtpTransport<Tokio1Executor> = 
-        AsyncSmtpTransport::<Tokio1Executor>::relay("smtp.gmail.com").unwrap()
-        .credentials(creds)
-        .build();
-    mailer.send(email).await.map_err(|_| EmailError::SendFailed)?;
+    let mailer: AsyncSmtpTransport<Tokio1Executor> =
+        AsyncSmtpTransport::<Tokio1Executor>::relay("smtp.gmail.com")
+            .unwrap()
+            .credentials(creds)
+            .build();
+    mailer
+        .send(email)
+        .await
+        .map_err(|_| EmailError::SendFailed)?;
     Ok(())
-    
 }
 
 pub async fn login(
@@ -86,11 +89,11 @@ pub async fn login(
             return Err(StatusCode::INTERNAL_SERVER_ERROR);
         }
     };
-    
+
     if let Err(e) = send_verification_email(&user.email, &code).await {
-            eprintln!("Failed to send email: {}", e);
-            return Err(StatusCode::INTERNAL_SERVER_ERROR);
-        }
+        eprintln!("Failed to send email: {}", e);
+        return Err(StatusCode::INTERNAL_SERVER_ERROR);
+    }
 
     Ok(Json(json!({
         "message": "Challenge created successfully and verification email sent",

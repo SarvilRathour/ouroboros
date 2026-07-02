@@ -1,19 +1,22 @@
-use axum::http::StatusCode;
-use axum::extract::State;
-use crate::{AppState, models::user::TwoFactorLogin};
-use serde::Deserialize;
-use axum::extract::Json;
-use serde_json::{Value, json};
-use chrono::Utc;
-use std::env;
 use crate::auth::jwt::generate_token;
+use crate::{AppState, models::user::TwoFactorLogin};
+use axum::extract::Json;
+use axum::extract::State;
+use axum::http::StatusCode;
+use chrono::Utc;
+use serde::Deserialize;
+use serde_json::{Value, json};
+use std::env;
 // #[derive(Deserialize)]
 // struct TwoFactorLoginPayload {
 //     code:String,
-    
+
 // }
 
-pub async fn two_factor_login(State(appstate):State<AppState>,Json(payload):Json<TwoFactorLogin>)->Result<Json<Value>,StatusCode>{
+pub async fn two_factor_login(
+    State(appstate): State<AppState>,
+    Json(payload): Json<TwoFactorLogin>,
+) -> Result<Json<Value>, StatusCode> {
     let challenge = appstate.user_repo.find_challenge_by_id(&payload.id).await;
     let challenge = match challenge {
         Ok(challenge) => challenge,
@@ -22,7 +25,7 @@ pub async fn two_factor_login(State(appstate):State<AppState>,Json(payload):Json
             return Err(StatusCode::INTERNAL_SERVER_ERROR);
         }
     };
-    if challenge.expires_at<Utc::now() {
+    if challenge.expires_at < Utc::now() {
         eprintln!("Expired token");
         return Err(StatusCode::UNAUTHORIZED);
     }
@@ -30,7 +33,7 @@ pub async fn two_factor_login(State(appstate):State<AppState>,Json(payload):Json
         eprintln!("Invalid code");
         return Err(StatusCode::UNAUTHORIZED);
     }
-    let user=appstate.user_repo.find_by_id(&challenge.user_id).await;
+    let user = appstate.user_repo.find_by_id(&challenge.user_id).await;
     let user = match user {
         Ok(user) => user,
         Err(e) => {
@@ -41,7 +44,7 @@ pub async fn two_factor_login(State(appstate):State<AppState>,Json(payload):Json
     let secret = env::var("SECRET").expect("SECRET must be set in .env file or environment");
     let token = generate_token(user.id, &secret, &user.role).unwrap();
     Ok(Json(json!({
-            "message": "Login successful",
-            "token": token
-        })))
+        "message": "Login successful",
+        "token": token
+    })))
 }

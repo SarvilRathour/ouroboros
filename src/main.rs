@@ -17,6 +17,7 @@ use auth::jwt;
 use handlers::auth_login::login;
 use handlers::curr_user::get_current_user;
 use handlers::health::health_check;
+use handlers::task::task_create;
 use handlers::user::register;
 use models::user::User;
 use repositories::user_repo;

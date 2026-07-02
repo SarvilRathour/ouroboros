@@ -59,7 +59,7 @@ fn extract_token(headers: &axum::http::HeaderMap) -> Option<&str> {
     let token = auth_header.to_str().ok()?;
     println!("TOKEN: {:?}", token);
     if token.starts_with("Bearer ") {
-        Some(&token[7..])
+        Some(token[7..].trim().trim_matches('"'))
     } else {
         None
     }
@@ -69,8 +69,11 @@ where
     AppState: FromRef<S>,
     S: Send + Sync,
 {
-    type Rejection=StatusCode;
-    async fn from_request_parts(parts: &mut axum::http::request::Parts, state: &S) -> Result<Self, Self::Rejection> {
+    type Rejection = StatusCode;
+    async fn from_request_parts(
+        parts: &mut axum::http::request::Parts,
+        state: &S,
+    ) -> Result<Self, Self::Rejection> {
         let app_state = AppState::from_ref(state);
         let headers = &parts.headers;
         let token = extract_token(headers);
@@ -87,6 +90,7 @@ where
             };
             Ok(claim)
         } else {
+            eprintln!("Error caused by middleware");
             Err(StatusCode::UNAUTHORIZED)
         }
     }

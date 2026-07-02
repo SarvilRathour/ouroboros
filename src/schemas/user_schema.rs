@@ -23,5 +23,5 @@ pub struct LoginUserRequest {
 // #[derive(Debug, Deserialize, FromRow)]
 // pub struct CreateTaskRequest{
 //     pub title:String,
-    
+
 // }
