@@ -22,6 +22,7 @@ use handlers::user::register;
 use models::user::User;
 use repositories::user_repo;
 use schemas::user_schema::RegisterUserRequest;
+use handlers::view_task::task_view_my_tasks;
 use state::AppState;
 #[tokio::main]
 async fn main() {
@@ -39,6 +40,7 @@ async fn main() {
         .route("/auth/login", post(login))
         .route("/auth/2fa_login", post(two_factor_login))
         .route("/task", post(task_create))
+        .route("/task/view-my-tasks", get(task_view_my_tasks))
         .with_state(app_state);
     let listener = tokio::net::TcpListener::bind("0.0.0.0:3000").await.unwrap();
     axum::serve(listener, app).await.unwrap();
