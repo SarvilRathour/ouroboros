@@ -100,11 +100,12 @@ impl UserRepo {
         Ok(())
     }
     pub async fn find_tasks_by_user(&self, user_id: &Uuid) -> Result<Vec<Task>, sqlx::Error> {
-        sqlx::query_as::<Postgres, Task>(
+        let tasks = sqlx::query_as::<Postgres, Task>(
             "SELECT * FROM tasks WHERE assigned_to_id = $1",
         )
         .bind(user_id)
         .fetch_all(&self.db)
-        .await?
+        .await?;
+        Ok(tasks)
     }
 }

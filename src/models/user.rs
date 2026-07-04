@@ -78,7 +78,7 @@ pub struct CreateTaskRequest {
     pub priority: task_priority,
     pub assign_to_email: String,
 }
-#[derive(Debug, Deserialize, FromRow)]
+#[derive(Debug, Deserialize, FromRow, Serialize)]
 pub struct Task {
     pub id: Uuid,
     pub title: String,

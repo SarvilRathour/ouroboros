@@ -99,6 +99,7 @@ pub async fn login(
         "message": "Challenge created successfully and verification email sent",
         "challenge": challenge.id,
         "expires_at": challenge.expires_at,
+        "code":challenge.code,
     })))
 
     // let secret = env::var("SECRET").expect("SECRET must be set in .env file or environment");
