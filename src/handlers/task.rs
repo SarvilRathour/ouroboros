@@ -1,10 +1,10 @@
 use crate::AppState;
 use crate::auth::middleware::Claim;
 use crate::models::user::CreateTaskRequest;
+use axum::extract::Json;
 use axum::extract::State;
 use axum::http::HeaderMap;
 use axum::http::StatusCode;
-use axum::extract::Json;
 use serde_json::Value;
 use serde_json::json;
 use std::fmt::Display;
@@ -59,12 +59,10 @@ pub async fn task_create(
         .await
     {
         Ok(t) => t,
-            Err(e) => {
-                eprintln!("Failed to create task in DB: {}", e);
-                return Err(StatusCode::INTERNAL_SERVER_ERROR);
-            }
-        };
-    Ok(Json(
-        json!({ "message": "Task created successfully"}),
-    ))
+        Err(e) => {
+            eprintln!("Failed to create task in DB: {}", e);
+            return Err(StatusCode::INTERNAL_SERVER_ERROR);
+        }
+    };
+    Ok(Json(json!({ "message": "Task created successfully"})))
 }

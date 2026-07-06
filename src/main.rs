@@ -19,17 +19,19 @@ use handlers::curr_user::get_current_user;
 use handlers::health::health_check;
 use handlers::task::task_create;
 use handlers::user::register;
+use handlers::view_task::task_view_my_tasks;
 use models::user::User;
 use repositories::user_repo;
 use schemas::user_schema::RegisterUserRequest;
-use handlers::view_task::task_view_my_tasks;
 use state::AppState;
 #[tokio::main]
 async fn main() {
     dotenvy::dotenv().ok();
     let database_url =
         env::var("DATABASE_URL").expect("DATABASE_URL must be set in .env file or environment");
-    let app_state = AppState::new_database(&database_url)
+    let redis_url =env::var("REDIS_URL").expect("REDIS_URL must be in .env file or environment");
+        env::var("REDIS_URL").expect("REDIS_URL must be set in .env file or environment");
+    let app_state = AppState::new_database(&database_url, &redis_url)
         .await
         .expect("failed to connect to database");
     println!("Database connected succesfully");

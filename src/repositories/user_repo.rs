@@ -7,7 +7,7 @@ use uuid::Uuid;
 pub struct UserRepo {
     pub db: PgPool,
 }
-use crate::models::user::{LoginChallenge, User, UserRole,Task};
+use crate::models::user::{LoginChallenge, Task, User, UserRole};
 use crate::models::user::{task_priority, task_status};
 impl UserRepo {
     pub fn new(db: PgPool) -> Self {
@@ -100,12 +100,11 @@ impl UserRepo {
         Ok(())
     }
     pub async fn find_tasks_by_user(&self, user_id: &Uuid) -> Result<Vec<Task>, sqlx::Error> {
-        let tasks = sqlx::query_as::<Postgres, Task>(
-            "SELECT * FROM tasks WHERE assigned_to_id = $1",
-        )
-        .bind(user_id)
-        .fetch_all(&self.db)
-        .await?;
+        let tasks =
+            sqlx::query_as::<Postgres, Task>("SELECT * FROM tasks WHERE assigned_to_id = $1")
+                .bind(user_id)
+                .fetch_all(&self.db)
+                .await?;
         Ok(tasks)
     }
 }

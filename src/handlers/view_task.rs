@@ -1,4 +1,6 @@
 use crate::auth::jwt::generate_token;
+use crate::auth::middleware::Claim;
+use crate::models::user::Task;
 use crate::{AppState, models::user::TwoFactorLogin};
 use axum::extract::Json;
 use axum::extract::State;
@@ -6,12 +8,13 @@ use axum::http::StatusCode;
 use chrono::Utc;
 use serde::Deserialize;
 use serde_json::{Value, json};
-use uuid::Uuid;
 use std::env;
-use crate::auth::middleware::Claim;
-use crate::models::user::Task;
-pub async fn task_view_my_tasks(claims:Claim,State(appstate):State<AppState>) -> Result<Json<Value>, StatusCode> {
-    if claims.role!="Staff"{
+use uuid::Uuid;
+pub async fn task_view_my_tasks(
+    claims: Claim,
+    State(appstate): State<AppState>,
+) -> Result<Json<Value>, StatusCode> {
+    if claims.role != "Staff" {
         return Err(StatusCode::UNAUTHORIZED);
     }
     let user_id = match Uuid::parse_str(&claims.sub) {
