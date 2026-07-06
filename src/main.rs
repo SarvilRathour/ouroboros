@@ -29,8 +29,8 @@ async fn main() {
     dotenvy::dotenv().ok();
     let database_url =
         env::var("DATABASE_URL").expect("DATABASE_URL must be set in .env file or environment");
-    let redis_url =env::var("REDIS_URL").expect("REDIS_URL must be in .env file or environment");
-        env::var("REDIS_URL").expect("REDIS_URL must be set in .env file or environment");
+    let redis_url = env::var("REDIS_URL").expect("REDIS_URL must be in .env file or environment");
+    env::var("REDIS_URL").expect("REDIS_URL must be set in .env file or environment");
     let app_state = AppState::new_database(&database_url, &redis_url)
         .await
         .expect("failed to connect to database");
